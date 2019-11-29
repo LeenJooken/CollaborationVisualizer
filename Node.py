@@ -8,9 +8,11 @@ class Node:
         self.weight = weight
         self.ID = programmer.getID()
 
+    def getProgrammer(self):
+        return self.programmer
 
     def getLabel(self):
-        return (self.programmer.getName())
+        return (self.programmer.getLabel())
 
     def getID(self):
         return self.ID

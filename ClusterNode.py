@@ -49,6 +49,14 @@ class ClusterNode:
     def containsNode(self,node):
         return(node in self.nodeslist)
 
+    #check if a node with this label is in this cluster
+    def contrainsNodeByLabel(self,nodeName):
+        for node in self.nodeslist:
+            if(node.getLabel == nodeName):
+                return True
+        return False
+
+
     def calculateWeight(self):
         weight = 0
         for node in self.nodeslist :
@@ -86,3 +94,9 @@ class ClusterNode:
                 list.append(edge)
 
         return list
+
+    def getListOfProgrammers(self):
+        prog = []
+        for node in self.nodeslist:
+            prog.append(node.getProgrammer())
+        return prog

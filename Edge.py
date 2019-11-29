@@ -1,10 +1,5 @@
 import Node
-#class that represents an edges
-#contains:
-#Source Node
-#Target Node
-#Weight
-#Type
+#class that represents an edge
 class Edge:
 
     def __init__(self,source,target):

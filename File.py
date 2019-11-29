@@ -3,9 +3,10 @@
 #Represents a file that is either Modified, Added or Deleted
 class File:
 
-    def __init__(self,path):
+    def __init__(self,path, fileID):
 
         self.path = path
+        self.fileID = fileID
         self.importance = 1
         self.modifiedInCommits = []
         self.addedInCommits = []
@@ -15,16 +16,39 @@ class File:
     def getPath(self):
         return self.path
 
+    def getID(self):
+        return self.fileID
+
     def getImportance(self):
         return self.importance
 
     def addCommit(self,commit,modifier):
-        if modifier == "Modified":
-            self.modifiedInCommits.append(commit)
+
+        if ((modifier == "Modified") or (modifier == "Replacing")):
+
+
+            if(not commit in self.modifiedInCommits):
+                self.modifiedInCommits.append(commit)
         elif modifier == "Added":
-            self.addedInCommits.append(commit)
+            if(not commit in self.addedInCommits):
+                self.addedInCommits.append(commit)
         elif modifier == "Deleted":
-            self.deletedInCommits.append(commit)
+            if(not commit in self.deletedInCommits):
+                self.deletedInCommits.append(commit)
+        else:
+            print("Modifier is not correct, given modifier: ",modifier," for file: ", self.path)
+
+    #Function that returns if the file was modifier, added or deleted in this commit
+    def getModifierStatus(self,commit):
+        if(commit in self.modifiedInCommits):
+            return "Modified"
+        elif (commit in self.addedInCommits):
+            return "Added"
+        elif (commit in self.deletedInCommits):
+            return "Deleted"
+        else:
+            print("Commit could not be found in the different modifier lists, commit number = ", commit.getRevisionNumber(), " file = ", self.path)
+
 
     #file is importance if it continues to grow over time
     #so when it get modified regularly
@@ -116,7 +140,7 @@ class File:
 
 
         importance = numberOfMonthsChanged/numberOfMonthsExistence
-        
+
         self.importance = importance
         return importance
 
@@ -147,3 +171,46 @@ class File:
                     numberOfMonths += 1
 
         return numberOfMonths
+
+    #returns a list of time stamps of the commits this programmer was involved in
+    #@param programmer the programmer we're searching the commits for
+    #@return a list of time stamps
+    def getListOfCommitTimestampsByProgrammer(self,programmer):
+        timestamps = []
+        #only added and modified is important
+        for commit in self.modifiedInCommits:
+            if(commit.hasAsContributor(programmer)):
+                timestamps.append(commit.getDate())
+        for commit in self.addedInCommits:
+            if(commit.hasAsContributor(programmer)):
+                date = commit.getDate()
+                if(not date in timestamps):
+                    timestamps.append(date)
+
+        return timestamps
+
+    #returns a list of time stamps of the commits these programmers were involved in
+    #@param listOfProgrammers a list of the programmers we're searching the commits for
+    #@return a list of distinct time stamps
+    def getListOfCommitTimestampsForAllTheseProgrammers(self,listOfProgrammers):
+        timestamps = set([])
+        for prog in listOfProgrammers:
+            timestamps |= set(self.getListOfCommitTimestampsByProgrammer(prog))
+        return list(timestamps)
+
+
+    #@return set of all the programmers that worked on this file
+    def getListOfContributors(self):
+        programmers = set([])
+        for commit in self.modifiedInCommits:
+            contributors = commit.getContributors()
+            programmers |= set(contributors)
+        for commit in self.addedInCommits:
+            contributors = commit.getContributors()
+            programmers |= set(contributors)
+        return programmers
+
+
+    #Function that returns a list with all the commits in which this file was added or modified
+    def getListOfAddedAndModifiedCommits(self):
+        return(self.addedInCommits + self.modifiedInCommits)

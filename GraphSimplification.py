@@ -1,14 +1,11 @@
 #Class that handles the graph simplification
-#Based the Fuzzy Mining Adaptive Graph Simplification technique
-#1. Conflict Resolution -> not applicable
-#2. Edge Filtering
-#3. Node Aggregation and Abstraction
 import operator
 import Edge
 import Node
 import Cluster
 import ClusterNode
 import ClusterEdge
+import Output
 
 class GraphSimplification:
 
@@ -43,6 +40,7 @@ class GraphSimplification:
         for node in self.nodeslist:
             weight += node.getWeight()
         cutoff = weight / len(self.nodeslist)
+
         return cutoff
 
     def calculateAggregationCorrelationParam(self,avgNodeWeight):
@@ -51,6 +49,7 @@ class GraphSimplification:
             weight += edge.getWeight()
         avgEdgeWeight = weight/len(self.edgeslist)
         corrParam = abs(avgNodeWeight - avgEdgeWeight)
+
         return corrParam
 
     #We need the local differences between a node and an incident edge
@@ -68,10 +67,14 @@ class GraphSimplification:
     def simplifyGraph(self):
         #Edge Filtering
         self.edgeFiltering()
+
         #Aggregation
         self.aggregation()
+
         #Abstraction
         self.abstraction()
+
+
 
 
     #Only possible for nodes that have >1 edge
@@ -634,7 +637,7 @@ class GraphSimplification:
         return optimalCandidate
 
 
-    #Finds th edge with teh greatest aggregation power, based on the distance significance to the target node
+    #Finds the edge with the greatest aggregation power, based on the distance significance to the target node
     #@param candidates: dict with edge as key and dict with node and cluster as value
     #@return optimal candidate tuple (node, edge, cluster)
     def findOptimalMergingCandidateNonAggr(self,candidates):
@@ -705,7 +708,7 @@ class GraphSimplification:
 
     #checks if all the incident edges on this node are too weak for aggregation
     #@return tuple with
-    #1.true if all edges too weak, else return false
+    #1. true if all edges too weak, else return false
     #2. the list of incidentEdges to delete
     #3. the list of incidentClusterEdges to delete
     #Algorithm = the same as for aggregation

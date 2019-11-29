@@ -10,12 +10,12 @@ import GraphSimplification
 class Graph:
 
     #@param listOfProgrammers is a list of Programmer objects
-    def __init__(self,listOfProgrammers,listOfCommits):
+    def __init__(self,listOfProgrammers,listOfCommits,nodeIterator):
         self.nodeslist = []
         self.edgeslist = []
         self.clusterNodeslist = []
         self.clusterEdgeslist = []
-
+        self.nodeIterator = nodeIterator
 
         self.constructGraph(listOfProgrammers,listOfCommits)
 
@@ -32,6 +32,12 @@ class Graph:
     def getClusterEdgesList(self):
         return self.clusterEdgeslist
 
+    def getNodeIterator(self):
+        return self.nodeIterator
+
+    def setNodeIterator(self,newIterator):
+        if(newIterator > self.nodeIterator):
+            self.nodeIterator = newIterator
 
     def addNodeToList(self,node):
         self.nodeslist.append(node)
@@ -41,7 +47,7 @@ class Graph:
 
     #searches for node with that ID in the nodelist and returns it
     #@param ID = the id of the node you're searching for
-    #@returns the node or ?
+    #@returns the node
     def getNodeByID(self,id):
         node = [target for target in self.nodeslist if target.getID()==id]
         return node[0]
@@ -69,10 +75,12 @@ class Graph:
         #build the pair programming edges
         edgecalc = EdgeCalculator.EdgeCalculator(commits,programmers)
         #returns dictionary with source and target nodes IDs as key + weight as value
+        print("   Building the pair programming edges")
         edgeDict = edgecalc.getPairProgrammingEdges()
         self.addPairProgrammingEdgesToList(edgeDict)
 
         #build all other edges apart from pair programming
+        print("   Building the disjunct collaboration edges")
         edgeDict2 = edgecalc.getDisjunctColloborationEdges()
         self.addDisjunctCollaborationEdgesToList(edgeDict2)
 
@@ -114,7 +122,6 @@ class Graph:
     #calculates the weights for the edges, making use of
     #frequency significance
     #proximity correlation
-    #datavalue correlation
     def calculateEdgeWeights(self):
         edgecalc = EdgeWeightCalculator.EdgeWeightCalculator(self.edgeslist)
         edgecalc.calculateEdgeWeights()
@@ -131,16 +138,22 @@ class Graph:
     #constructs the graph: builds node & edges list
     def constructGraph(self,programmers,commits):
         #build the base graph
+        print("Building the nodes list")
         self.buildNodesList(programmers)
+        print("Building the edges list")
         self.buildEdgesList(commits,programmers)
 
 
         #calculate the weights
+        print("Calculating the edge weights")
         self.calculateEdgeWeights()
+        print("Calculating the node weights")
         self.calculateNodeWeights()
 
         #simplyfiy the graph
+        print("Simplifying the graph")
         self.graphSimplification()
+
 
 
     #simplify the graph
@@ -152,7 +165,7 @@ class Graph:
         self.clusterNodeslist = simplifier.getClusterNodesList()
         self.clusterEdgeslist = simplifier.getClusterEdgesList()
 
-
+    
 
 
     #function that deletes the node from the graph,

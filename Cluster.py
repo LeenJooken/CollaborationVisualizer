@@ -1,4 +1,4 @@
-#Class that represent a cluster of nodes
+#Class that represents a cluster of nodes
 
 
 class Cluster:

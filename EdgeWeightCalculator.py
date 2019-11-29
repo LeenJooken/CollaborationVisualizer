@@ -33,8 +33,20 @@ class EdgeWeightCalculator:
 
 
         for edge in self.edgesList:
-            freqSign = (freqDict[edge]-fsMin)/(fsMax-fsMin)
-            proxCorr = (proxDict[edge]-pcMin)/(pcMax-pcMin)
+
+            if(fsMax == fsMin):
+                freqSign = 1/len(freqDict)
+
+            else:
+
+                freqSign = (freqDict[edge]-fsMin)/(fsMax-fsMin)
+
+            if(pcMax == pcMin):
+                proxCorr = 1/len(proxDict)
+                
+            else:
+
+                proxCorr = (proxDict[edge]-pcMin)/(pcMax-pcMin)
             #weight is a combi of those metrics
             weight = self.FSW*freqSign + self.PCW*proxCorr
             edge.setWeight(weight)
